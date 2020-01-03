@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:quiz_app/question_brain.dart';
-import 'package:quiz_app/questions.dart';
+import 'package:rflutter_alert/rflutter_alert.dart';
 
 QuestionBrain questionBrain = new QuestionBrain();
 
@@ -26,10 +26,10 @@ class MyApp extends StatelessWidget {
 
 class QuizPage extends StatefulWidget {
   @override
-  QuizPageState createState() => QuizPageState();
+  _QuizPageState createState() => _QuizPageState();
 }
 
-class QuizPageState extends State<QuizPage> {
+class _QuizPageState extends State<QuizPage> {
   List<Widget> scorekeeper = [];
 //  List<String> questions = [
 //    "Mount everest is in Nepal.",
@@ -37,7 +37,37 @@ class QuizPageState extends State<QuizPage> {
 //  ];
 //  List<bool> answers = [true, true];
 
-  int questionNumber = 0;
+  void checkAnswer(bool userPickedAnswer) {
+    bool correctAnswer = questionBrain.getAnswerResult();
+
+    setState(() {
+      if (questionBrain.isFinished() == true) {
+        Alert(
+          context: context,
+          title: 'Finished!',
+          desc: 'You\'ve reached the end of the quiz.',
+        ).show();
+
+        questionBrain.reset();
+
+        scorekeeper = [];
+      } else {
+        if (userPickedAnswer == correctAnswer) {
+          scorekeeper.add(Icon(
+            Icons.check,
+            color: Colors.green,
+          ));
+        } else {
+          scorekeeper.add(Icon(
+            Icons.close,
+            color: Colors.red,
+          ));
+        }
+        questionBrain.nextQuestion();
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -50,7 +80,7 @@ class QuizPageState extends State<QuizPage> {
             padding: EdgeInsets.all(10.0),
             child: Center(
               child: Text(
-                questionBrain.questions[questionNumber].questionText,
+                questionBrain.getQuestionText(),
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 25.0,
@@ -73,23 +103,7 @@ class QuizPageState extends State<QuizPage> {
                 ),
               ),
               onPressed: () {
-                setState(() {
-                  if (questionBrain.questions[questionNumber].answerResult ==
-                      true) {
-                    print("User is right");
-                    scorekeeper.add(Icon(
-                      Icons.check,
-                      color: Colors.green,
-                    ));
-                  } else {
-                    print("User is wrong");
-                    scorekeeper.add(Icon(
-                      Icons.close,
-                      color: Colors.red,
-                    ));
-                  }
-                  questionNumber++;
-                });
+                checkAnswer(true);
               },
             ),
           ),
@@ -107,20 +121,17 @@ class QuizPageState extends State<QuizPage> {
                 ),
               ),
               onPressed: () {
-                setState(() {
-                  questionNumber++;
-                  scorekeeper.add(Icon(
-                    Icons.close,
-                    color: Colors.red,
-                  ));
-                });
+                checkAnswer(false);
               },
             ),
           ),
         ),
         //TODO : i need to add something here
-        Row(
-          children: scorekeeper,
+        SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: Row(
+            children: scorekeeper,
+          ),
         )
       ],
     );

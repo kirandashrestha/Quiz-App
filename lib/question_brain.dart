@@ -1,7 +1,8 @@
 import 'questions.dart';
 
 class QuestionBrain {
-  List<Questions> questions = [
+  int _questionNumber = 0;
+  List<Questions> _questions = [
     Questions("It is done by KDS.", true),
     Questions("Mount everest is in Nepal.", true),
     Questions('Some cats are actually allergic to humans', true),
@@ -31,4 +32,30 @@ class QuestionBrain {
         "In West Virginia, USA, if you accidentally hit an animal with your car, you are free to take it home to eat.",
         true),
   ];
+
+  String getQuestionText() {
+    return _questions[_questionNumber].questionText;
+  }
+
+  bool getAnswerResult() {
+    return _questions[_questionNumber].answerResult;
+  }
+
+  void nextQuestion() {
+    if (_questionNumber < _questions.length) {
+      _questionNumber++;
+    }
+  }
+
+  void reset() {
+    _questionNumber = 0;
+  }
+
+  bool isFinished() {
+    if (_questionNumber < _questions.length - 1) {
+      return false;
+    } else {
+      return true;
+    }
+  }
 }
